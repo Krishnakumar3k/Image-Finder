@@ -14,57 +14,59 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+#### Objective: 
+Develop a web application that leverages a Free Image API to allow users to search for images, add custom captions and shapes, and download the modified images.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# Functional Requirements:
 
-### `npm run eject`
+## Search Page Design:
+Implement a search input and a result area to display images fetched from any Free Image API (e.g., Unsplash, Pixabay, Pexels, Flickr).
+Each search result should include an "Add Captions" button.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Image Handling and Display:
+Upon clicking "Add Captions," display the selected image on a canvas using fabric.js, allowing users to manipulate it.
+Canvas Interaction:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Enable users to add text layers (editable and resizable) and basic shapes (Triangle, Circle, Rectangle, Polygon) on the canvas.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Support layering of elements where shapes can be placed above the image and text layers above shapes.
 
-## Learn More
+Provide functionality to drag, resize, and reposition both shapes and text layers.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+#### Download Functionality:
+Include a "Download" button adjacent to the canvas.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Clicking this button should generate and download the modified image with added captions and shapes.
 
-### Code Splitting
+##### Error Handling and Validation:
+Implement proper error handling for API requests and canvas interactions.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Validate user inputs such as search queries and ensure appropriate feedback is given.
 
-### Analyzing the Bundle Size
+###### Technical Stack:
+# Frontend: 
+HTML, CSS (for layout and styling), JavaScript (React or Vanilla JS for functionality), fabric.js for canvas manipulation.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## API Integration: 
+Choose and integrate any suitable Free Image API.
 
-### Making a Progressive Web App
+### Deployment: 
+Use platforms like CodeSandbox, CodePen, or similar for deployment and showcasing.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-### Advanced Configuration
+#### Submission Details:
+Create an account on a preferred platform (e.g., CodeSandbox, CodePen).
+Deploy the working application with clear instructions on how to use it.
+Include a sketch or mockup of the layout to guide your design process.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+##### Bonus Points:
+Log all canvas layers and their attributes (e.g., image, shapes, text) in an array format for debugging and transparency.
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+###### Resources:
+Free Image APIs: Unsplash, Pixabay, Pexels, Flickr.
+fabric.js Documentation: Fabric.js.
