@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-
+// Search Img
 const SearchImg = ({ onSelect }) => {
   const [query, setQuery] = useState('');
   const [images, setImages] = useState([]);
