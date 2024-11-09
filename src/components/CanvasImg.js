@@ -1,18 +1,18 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Canvas, Image, Textbox, Circle, Rect, Triangle, Polygon } from "fabric";
 
-const ImageCanvas = ({ imageUrl, onReset }) => {
+const CanvasImg = ({ imageUrl, onReset }) => {
   const canvasRef = useRef(null);
   const fabricCanvas = useRef(null);
-  const [imageError, setImageError] = useState(false); // Track image loading error
+  const [imageError, setImageError] = useState(false); 
 
   useEffect(() => {
     fabricCanvas.current = new Canvas(canvasRef.current, {
       backgroundColor: 'white',
-      selection: true, // Allow selection of objects
+      selection: true, 
     });
 
-    // Load image onto canvas
+   
     Image.fromURL(
       imageUrl,
       (img) => {
@@ -34,12 +34,12 @@ const ImageCanvas = ({ imageUrl, onReset }) => {
             left: canvasWidth / 2,
           }
         );
-        setImageError(false); // Reset image error
+        setImageError(false); 
       },
       { crossOrigin: "anonymous" }
     ).catch((err) => {
       console.error("Error loading image:", err);
-      setImageError(true); // Set error state
+      setImageError(true); 
     });
 
     return () => {
@@ -147,7 +147,7 @@ const ImageCanvas = ({ imageUrl, onReset }) => {
       </button>
 
       {imageError && (
-        <div className="text-red-500 mb-4">Failed to load image. Please try again later.</div>
+        <div className="text-red-500 mb-4">Image Loading Faild Plz. Try Later</div>
       )}
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -167,4 +167,4 @@ const ImageCanvas = ({ imageUrl, onReset }) => {
   );
 };
 
-export default ImageCanvas;
+export default CanvasImg;
