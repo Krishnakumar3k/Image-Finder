@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const SearchImg = ({ onSelect }) => {
@@ -7,17 +7,15 @@ const SearchImg = ({ onSelect }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchImages = async () => {
+  const fetchImages = useCallback(async () => {
     if (!query) return;
     setLoading(true);
     setError(null);
     try {
-      // const response = await axios.get('https://api.unsplash.com/photos/', {
       const response = await axios.get('https://api.unsplash.com/search/photos', {
         params: { query, per_page: 20 },
         headers: {
           Authorization: 'Client-ID RV8KcXQYoLo5djNFZOxnJk5egtXl9VkTG_AP2pBuNOU',
-          
         },
       });
       setImages(response.data.results);
@@ -27,14 +25,14 @@ const SearchImg = ({ onSelect }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [query]);
 
   useEffect(() => {
     if (query) {
       const handler = setTimeout(fetchImages, 300);
       return () => clearTimeout(handler);
     }
-  }, [query]);
+  }, [query, fetchImages]);
 
   return (
     <>
@@ -73,7 +71,6 @@ const SearchImg = ({ onSelect }) => {
                   const caption = prompt('Enter a caption for this image:');
                   if (caption) {
                     console.log(`Caption for ${image.id}: ${caption}`);
-
                   }
                 }}
               >
