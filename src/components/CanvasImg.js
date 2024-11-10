@@ -10,76 +10,70 @@ const CanvasImg = ({ imageUrl, onReset }) => {
   useEffect(() => {
     // Initialize the Fabric.js canvas
     fabricCanvas.current = new fabric.Canvas(canvasRef.current, {
-      backgroundColor: 'white',
       selection: true,
     });
 
-    // Check if image URL is valid
     if (!imageUrl) {
       setImageError(true);
       return;
     }
 
-    // Load and set the background image
-    fabric.Image.fromURL(
-      imageUrl,
-      (img) => {
-        const canvasWidth = fabricCanvas.current.width;
-        const canvasHeight = fabricCanvas.current.height;
-        const scaleX = canvasWidth / img.width;
-        const scaleY = canvasHeight / img.height;
-        const scale = Math.min(scaleX, scaleY);
+    const pugImg = new Image();
+    pugImg.crossOrigin = "anonymous"; // Set cross-origin for CORS compliance
+    pugImg.onload = function () {
+      const canvasWidth = fabricCanvas.current.width;
+      const canvasHeight = fabricCanvas.current.height;
 
-        fabricCanvas.current.setBackgroundImage(
-          img,
-          fabricCanvas.current.renderAll.bind(fabricCanvas.current),
-          {
-            scaleX: scale,
-            scaleY: scale,
-            originX: "center",
-            originY: "center",
-            top: canvasHeight / 2,
-            left: canvasWidth / 2,
-          }
-        );
-        fabricCanvas.current.renderAll(); // Ensure canvas is re-rendered
-        setImageLoaded(true); // Update state when image is loaded
-        setImageError(false); // Reset error state if image is loaded successfully
-      },
-      () => {
-        setImageError(true); // Set error if image loading fails
-        setImageLoaded(false); // Reset loaded state on error
-      },
-      { crossOrigin: "anonymous" }
-    );
+      const scaleX = canvasWidth / pugImg.width;
+      const scaleY = canvasHeight / pugImg.height;
+      const scale = Math.min(scaleX, scaleY);
 
-    // Cleanup on component unmount
+      const pug = new fabric.Image(pugImg, {
+        scaleX: scale,
+        scaleY: scale,
+        originX: "center",
+        originY: "center",
+        left: canvasWidth / 2,
+        top: canvasHeight / 2,
+      });
+
+      fabricCanvas.current.add(pug);
+      fabricCanvas.current.renderAll();
+      setImageLoaded(true);
+      setImageError(false);
+    };
+
+    pugImg.onerror = () => {
+      setImageError(true);
+      setImageLoaded(false);
+    };
+
+    pugImg.src = imageUrl;
+
     return () => {
       fabricCanvas.current.dispose();
     };
   }, [imageUrl]);
 
-  // Add a text box to the canvas with customizable properties
   const addText = () => {
     const text = new fabric.Textbox("Edit me", {
       left: 100,
       top: 100,
       width: 200,
       fontSize: 20,
-      fill: "black", // Text color
-      fontWeight: "bold", // Default font weight
-      fontStyle: "italic", // Default font style
-      underline: true, // Default underline
+      fill: "black",
+      fontWeight: "bold",
+      fontStyle: "italic",
+      underline: true,
     });
     fabricCanvas.current.add(text);
     fabricCanvas.current.setActiveObject(text);
   };
 
-  // Add a shape to the canvas based on the shapeType argument
   const addShape = (shapeType) => {
     let shape;
-    const borderColor = "black"; // Default border color
-    const borderWidth = 2; // Border width
+    const borderColor = "black";
+    const borderWidth = 2;
 
     switch (shapeType) {
       case "circle":
@@ -87,9 +81,9 @@ const CanvasImg = ({ imageUrl, onReset }) => {
           radius: 50,
           left: 100,
           top: 100,
-          fill: null, // Transparent by default
-          stroke: borderColor, // Set border color
-          strokeWidth: borderWidth, // Set border width
+          fill: null,
+          stroke: borderColor,
+          strokeWidth: borderWidth,
         });
         break;
       case "rectangle":
@@ -98,9 +92,9 @@ const CanvasImg = ({ imageUrl, onReset }) => {
           height: 50,
           left: 100,
           top: 100,
-          fill: null, // Transparent by default
-          stroke: borderColor, // Set border color
-          strokeWidth: borderWidth, // Set border width
+          fill: null,
+          stroke: borderColor,
+          strokeWidth: borderWidth,
         });
         break;
       case "triangle":
@@ -109,9 +103,9 @@ const CanvasImg = ({ imageUrl, onReset }) => {
           height: 100,
           left: 100,
           top: 100,
-          fill: null, // Transparent by default
-          stroke: borderColor, // Set border color
-          strokeWidth: borderWidth, // Set border width
+          fill: null,
+          stroke: borderColor,
+          strokeWidth: borderWidth,
         });
         break;
       case "polygon":
@@ -125,9 +119,9 @@ const CanvasImg = ({ imageUrl, onReset }) => {
           {
             left: 100,
             top: 100,
-            fill: null, // Transparent by default
-            stroke: borderColor, // Set border color
-            strokeWidth: borderWidth, // Set border width
+            fill: null,
+            stroke: borderColor,
+            strokeWidth: borderWidth,
           }
         );
         break;
@@ -139,16 +133,14 @@ const CanvasImg = ({ imageUrl, onReset }) => {
     fabricCanvas.current.setActiveObject(shape);
   };
 
-  // Function to fill the selected shape with a color and remove the border
   const fillShapeWithColor = (color) => {
     const activeObject = fabricCanvas.current.getActiveObject();
     if (activeObject) {
-      activeObject.set({ fill: color, stroke: null }); // Fill the shape with the selected color and remove border
+      activeObject.set({ fill: color, stroke: null });
       fabricCanvas.current.renderAll();
     }
   };
 
-  // Remove the currently active object from the canvas
   const removeActiveObject = () => {
     const activeObject = fabricCanvas.current.getActiveObject();
     if (activeObject) {
@@ -158,7 +150,6 @@ const CanvasImg = ({ imageUrl, onReset }) => {
     }
   };
 
-  // Remove all objects except the background image
   const removeAllObjects = () => {
     fabricCanvas.current.getObjects().forEach((obj) => {
       if (obj !== fabricCanvas.current.backgroundImage) {
@@ -168,16 +159,19 @@ const CanvasImg = ({ imageUrl, onReset }) => {
     fabricCanvas.current.renderAll();
   };
 
-  // Download the canvas as an image
   const downloadImage = () => {
-    const dataURL = fabricCanvas.current.toDataURL({
-      format: "png",
-      quality: 1,
-    });
-    const link = document.createElement("a");
-    link.href = dataURL;
-    link.download = "canvas.png";
-    link.click();
+    try {
+      const dataURL = fabricCanvas.current.toDataURL({
+        format: "png",
+        quality: 1,
+      });
+      const link = document.createElement("a");
+      link.href = dataURL;
+      link.download = "canvas.png";
+      link.click();
+    } catch (error) {
+      console.error("Failed to download image:", error);
+    }
   };
 
   return (
@@ -206,7 +200,7 @@ const CanvasImg = ({ imageUrl, onReset }) => {
         <button onClick={() => fillShapeWithColor("blue")} className="bg-blue-500 text-white p-2 rounded">Fill Blue</button>
       </div>
 
-      <canvas ref={canvasRef} width={800} height={600} className="border"></canvas>
+      <canvas ref={canvasRef} width={800} height={600} className="border" id="canvas"></canvas>
 
       <button onClick={downloadImage} className="bg-red-500 text-white p-2 rounded mt-4">Download</button>
     </div>
