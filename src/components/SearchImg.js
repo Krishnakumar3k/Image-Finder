@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { saveAs } from 'file-saver';
 
 const SearchImg = ({ onSelect }) => {
   const [query, setQuery] = useState('');
@@ -38,6 +39,20 @@ const SearchImg = ({ onSelect }) => {
     onSelect(image.urls.regular); // Pass the selected image URL directly to the canvas editor
   };
 
+  const handleDownloadImage = (imageUrl) => {
+    // Fetch the image and trigger the download with FileSaver.js
+    axios.get(imageUrl, { responseType: 'blob' })
+      .then(response => {
+        // Extract the file name from the URL
+        const fileName = imageUrl.split('/').pop().split('?')[0];
+        const pngFileName = fileName.endsWith('.png') ? fileName : fileName + '.png'; // Ensure the file ends with .png
+        saveAs(response.data, pngFileName); // Save as PNG
+      })
+      .catch((error) => {
+        console.error('Download error:', error);
+      });
+  };
+
   return (
     <>
       <div className="flex justify-center mb-4">
@@ -66,17 +81,32 @@ const SearchImg = ({ onSelect }) => {
       <div className="p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
           {images.map((image) => (
-            <div key={image.id} className="cursor-pointer" onClick={() => onSelect(image.urls.regular)}>
-              <img src={image.urls.small} alt={image.alt_description} className="w-full h-auto rounded object-cover" />
-              <button
-                className="bg-green-500 text-white p-2 rounded mt-2"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAddCaption(image); // Pass the image object directly to the handleAddCaption function
-                }}
-              >
-                Add in Caption
-              </button>
+            <div key={image.id} className="cursor-pointer">
+              <img
+                src={image.urls.small}
+                alt={image.alt_description}
+                className="w-full h-auto rounded object-cover"
+              />
+              <div className="flex justify-between items-center mt-2 ">
+                <button
+                  className="bg-green-500 text-white p-1 rounded ml-5"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddCaption(image); // Pass the image object directly to the handleAddCaption function
+                  }}
+                >
+                  Add Caption
+                </button>
+                <button
+                  className="bg-blue-500 text-white p-1 rounded mr-5"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDownloadImage(image.urls.full); // Download the image in PNG format
+                  }}
+                >
+                  Download
+                </button>
+              </div>
             </div>
           ))}
         </div>

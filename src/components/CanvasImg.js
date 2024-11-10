@@ -5,9 +5,10 @@ const CanvasImg = ({ imageUrl, onReset }) => {
   const canvasRef = useRef(null);
   const fabricCanvas = useRef(null);
   const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
-    // Initialize the Fabric.js canvas----------------------------KKK
+    // Initialize the Fabric.js canvas
     fabricCanvas.current = new fabric.Canvas(canvasRef.current, {
       backgroundColor: 'white',
       selection: true,
@@ -41,15 +42,16 @@ const CanvasImg = ({ imageUrl, onReset }) => {
             left: canvasWidth / 2,
           }
         );
+        fabricCanvas.current.renderAll(); // Ensure canvas is re-rendered
+        setImageLoaded(true); // Update state when image is loaded
         setImageError(false); // Reset error state if image is loaded successfully
+      },
+      () => {
+        setImageError(true); // Set error if image loading fails
+        setImageLoaded(false); // Reset loaded state on error
       },
       { crossOrigin: "anonymous" }
     );
-
-    // Error handling if image loading fails
-    fabric.Image.fromURL(imageUrl, () => {}, () => {
-      setImageError(true);
-    });
 
     // Cleanup on component unmount
     return () => {
@@ -78,7 +80,7 @@ const CanvasImg = ({ imageUrl, onReset }) => {
     let shape;
     const borderColor = "black"; // Default border color
     const borderWidth = 2; // Border width
-    
+
     switch (shapeType) {
       case "circle":
         shape = new fabric.Circle({
@@ -184,8 +186,11 @@ const CanvasImg = ({ imageUrl, onReset }) => {
         Back to Search
       </button>
 
-      {imageError && (
+      {imageError && !imageLoaded && (
         <div className="text-red-500 mb-4">Image Loading Failed. Please Try Later</div>
+      )}
+      {!imageError && imageLoaded && (
+        <div className="text-green-500 mb-4">Image Loaded Successfully</div>
       )}
 
       <div className="mt-4 flex flex-wrap gap-2">
