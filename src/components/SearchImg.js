@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-// Search Img
+
 const SearchImg = ({ onSelect }) => {
   const [query, setQuery] = useState('');
   const [images, setImages] = useState([]);
@@ -33,6 +33,10 @@ const SearchImg = ({ onSelect }) => {
       return () => clearTimeout(handler);
     }
   }, [query, fetchImages]);
+
+  const handleAddCaption = (image) => {
+    onSelect(image.urls.regular); // Pass the selected image URL directly to the canvas editor
+  };
 
   return (
     <>
@@ -68,13 +72,10 @@ const SearchImg = ({ onSelect }) => {
                 className="bg-green-500 text-white p-2 rounded mt-2"
                 onClick={(e) => {
                   e.stopPropagation();
-                  const caption = prompt('Enter a caption for this image:');
-                  if (caption) {
-                    console.log(`Caption for ${image.id}: ${caption}`);
-                  }
+                  handleAddCaption(image); // Pass the image object directly to the handleAddCaption function
                 }}
               >
-                Add Captions
+                Add in Caption
               </button>
             </div>
           ))}

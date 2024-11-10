@@ -1,19 +1,26 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Canvas, Image, Textbox, Circle, Rect, Triangle, Polygon } from "fabric";
+import * as fabric from "fabric";
 
 const CanvasImg = ({ imageUrl, onReset }) => {
   const canvasRef = useRef(null);
   const fabricCanvas = useRef(null);
-  const [imageError, setImageError] = useState(false); 
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
-    fabricCanvas.current = new Canvas(canvasRef.current, {
+    // Initialize the Fabric.js canvas----------------------------KKK
+    fabricCanvas.current = new fabric.Canvas(canvasRef.current, {
       backgroundColor: 'white',
-      selection: true, 
+      selection: true,
     });
 
-   
-    Image.fromURL(
+    // Check if image URL is valid
+    if (!imageUrl) {
+      setImageError(true);
+      return;
+    }
+
+    // Load and set the background image
+    fabric.Image.fromURL(
       imageUrl,
       (img) => {
         const canvasWidth = fabricCanvas.current.width;
@@ -34,62 +41,79 @@ const CanvasImg = ({ imageUrl, onReset }) => {
             left: canvasWidth / 2,
           }
         );
-        setImageError(false); 
+        setImageError(false); // Reset error state if image is loaded successfully
       },
       { crossOrigin: "anonymous" }
-    ).catch((err) => {
-      console.error("Error loading image:", err);
-      setImageError(true); 
+    );
+
+    // Error handling if image loading fails
+    fabric.Image.fromURL(imageUrl, () => {}, () => {
+      setImageError(true);
     });
 
+    // Cleanup on component unmount
     return () => {
       fabricCanvas.current.dispose();
     };
   }, [imageUrl]);
 
+  // Add a text box to the canvas with customizable properties
   const addText = () => {
-    const text = new Textbox("Edit me", {
+    const text = new fabric.Textbox("Edit me", {
       left: 100,
       top: 100,
       width: 200,
       fontSize: 20,
-      fill: "black",
+      fill: "black", // Text color
+      fontWeight: "bold", // Default font weight
+      fontStyle: "italic", // Default font style
+      underline: true, // Default underline
     });
     fabricCanvas.current.add(text);
     fabricCanvas.current.setActiveObject(text);
   };
 
+  // Add a shape to the canvas based on the shapeType argument
   const addShape = (shapeType) => {
     let shape;
+    const borderColor = "black"; // Default border color
+    const borderWidth = 2; // Border width
+    
     switch (shapeType) {
       case "circle":
-        shape = new Circle({
+        shape = new fabric.Circle({
           radius: 50,
-          fill: "blue",
           left: 100,
           top: 100,
+          fill: null, // Transparent by default
+          stroke: borderColor, // Set border color
+          strokeWidth: borderWidth, // Set border width
         });
         break;
       case "rectangle":
-        shape = new Rect({
+        shape = new fabric.Rect({
           width: 100,
           height: 50,
-          fill: "green",
           left: 100,
           top: 100,
+          fill: null, // Transparent by default
+          stroke: borderColor, // Set border color
+          strokeWidth: borderWidth, // Set border width
         });
         break;
       case "triangle":
-        shape = new Triangle({
+        shape = new fabric.Triangle({
           width: 100,
           height: 100,
-          fill: "yellow",
           left: 100,
           top: 100,
+          fill: null, // Transparent by default
+          stroke: borderColor, // Set border color
+          strokeWidth: borderWidth, // Set border width
         });
         break;
       case "polygon":
-        shape = new Polygon(
+        shape = new fabric.Polygon(
           [
             { x: 50, y: 0 },
             { x: 100, y: 50 },
@@ -97,9 +121,11 @@ const CanvasImg = ({ imageUrl, onReset }) => {
             { x: 0, y: 50 },
           ],
           {
-            fill: "red",
             left: 100,
             top: 100,
+            fill: null, // Transparent by default
+            stroke: borderColor, // Set border color
+            strokeWidth: borderWidth, // Set border width
           }
         );
         break;
@@ -111,6 +137,16 @@ const CanvasImg = ({ imageUrl, onReset }) => {
     fabricCanvas.current.setActiveObject(shape);
   };
 
+  // Function to fill the selected shape with a color and remove the border
+  const fillShapeWithColor = (color) => {
+    const activeObject = fabricCanvas.current.getActiveObject();
+    if (activeObject) {
+      activeObject.set({ fill: color, stroke: null }); // Fill the shape with the selected color and remove border
+      fabricCanvas.current.renderAll();
+    }
+  };
+
+  // Remove the currently active object from the canvas
   const removeActiveObject = () => {
     const activeObject = fabricCanvas.current.getActiveObject();
     if (activeObject) {
@@ -120,6 +156,7 @@ const CanvasImg = ({ imageUrl, onReset }) => {
     }
   };
 
+  // Remove all objects except the background image
   const removeAllObjects = () => {
     fabricCanvas.current.getObjects().forEach((obj) => {
       if (obj !== fabricCanvas.current.backgroundImage) {
@@ -129,6 +166,7 @@ const CanvasImg = ({ imageUrl, onReset }) => {
     fabricCanvas.current.renderAll();
   };
 
+  // Download the canvas as an image
   const downloadImage = () => {
     const dataURL = fabricCanvas.current.toDataURL({
       format: "png",
@@ -147,7 +185,7 @@ const CanvasImg = ({ imageUrl, onReset }) => {
       </button>
 
       {imageError && (
-        <div className="text-red-500 mb-4">Image Loading Faild Plz. Try Later</div>
+        <div className="text-red-500 mb-4">Image Loading Failed. Please Try Later</div>
       )}
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -158,6 +196,9 @@ const CanvasImg = ({ imageUrl, onReset }) => {
         <button onClick={() => addShape("polygon")} className="bg-blue-500 text-white p-2 rounded">Add Polygon</button>
         <button onClick={removeActiveObject} className="bg-yellow-500 text-white p-2 rounded">Remove Active</button>
         <button onClick={removeAllObjects} className="bg-red-500 text-white p-2 rounded">Clear All</button>
+        <button onClick={() => fillShapeWithColor("red")} className="bg-red-500 text-white p-2 rounded">Fill Red</button>
+        <button onClick={() => fillShapeWithColor("green")} className="bg-green-500 text-white p-2 rounded">Fill Green</button>
+        <button onClick={() => fillShapeWithColor("blue")} className="bg-blue-500 text-white p-2 rounded">Fill Blue</button>
       </div>
 
       <canvas ref={canvasRef} width={800} height={600} className="border"></canvas>
