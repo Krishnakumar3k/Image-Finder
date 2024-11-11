@@ -7,6 +7,8 @@ const CanvasImg = ({ imageUrl, onReset }) => {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [fillColor, setFillColor] = useState("#000000");
+  const [fontFamily, setFontFamily] = useState("Arial");
+  const [fontSize, setFontSize] = useState(20);
 
   useEffect(() => {
     fabricCanvas.current = new fabric.Canvas(canvasRef.current, { selection: true });
@@ -32,6 +34,7 @@ const CanvasImg = ({ imageUrl, onReset }) => {
         originY: "center",
         left: canvasWidth / 2,
         top: canvasHeight / 2,
+        selectable: false, // Prevents the image from being selected when clicked
       });
 
       fabricCanvas.current.add(pug);
@@ -60,8 +63,10 @@ const CanvasImg = ({ imageUrl, onReset }) => {
       fontSize: 20,
       fill: "black",
     });
+
     fabricCanvas.current.add(text);
     fabricCanvas.current.setActiveObject(text);
+    fabricCanvas.current.renderAll();
   };
 
   const toggleBold = () => {
@@ -95,19 +100,19 @@ const CanvasImg = ({ imageUrl, onReset }) => {
 
     switch (shapeType) {
       case "circle":
-        shape = new fabric.Circle({ radius: 50, left: 100, top: 100, fill: null, stroke: borderColor, strokeWidth: borderWidth });
+        shape = new fabric.Circle({ radius: 50, left: 100, top: 100, fill: fillColor, stroke: borderColor, strokeWidth: borderWidth });
         break;
       case "rectangle":
-        shape = new fabric.Rect({ width: 100, height: 50, left: 100, top: 100, fill: null, stroke: borderColor, strokeWidth: borderWidth });
+        shape = new fabric.Rect({ width: 100, height: 50, left: 100, top: 100, fill: fillColor, stroke: borderColor, strokeWidth: borderWidth });
         break;
       case "triangle":
-        shape = new fabric.Triangle({ width: 100, height: 100, left: 100, top: 100, fill: null, stroke: borderColor, strokeWidth: borderWidth });
+        shape = new fabric.Triangle({ width: 100, height: 100, left: 100, top: 100, fill: fillColor, stroke: borderColor, strokeWidth: borderWidth });
         break;
       case "polygon":
         shape = new fabric.Polygon([{ x: 50, y: 0 }, { x: 100, y: 50 }, { x: 50, y: 100 }, { x: 0, y: 50 }], {
           left: 100,
           top: 100,
-          fill: null,
+          fill: fillColor,
           stroke: borderColor,
           strokeWidth: borderWidth,
         });
@@ -118,6 +123,7 @@ const CanvasImg = ({ imageUrl, onReset }) => {
 
     fabricCanvas.current.add(shape);
     fabricCanvas.current.setActiveObject(shape);
+    fabricCanvas.current.renderAll();
   };
 
   const fillShapeWithColor = (color) => {
@@ -154,6 +160,24 @@ const CanvasImg = ({ imageUrl, onReset }) => {
     link.click();
   };
 
+  const handleFontChange = (e) => {
+    setFontFamily(e.target.value);
+    const activeObject = fabricCanvas.current.getActiveObject();
+    if (activeObject && activeObject.type === "textbox") {
+      activeObject.set("fontFamily", e.target.value);
+      fabricCanvas.current.renderAll();
+    }
+  };
+
+  const handleFontSizeChange = (size) => {
+    setFontSize(size);
+    const activeObject = fabricCanvas.current.getActiveObject();
+    if (activeObject && activeObject.type === "textbox") {
+      activeObject.set("fontSize", size);
+      fabricCanvas.current.renderAll();
+    }
+  };
+
   return (
     <div className="p-4">
       <button onClick={onReset} className="bg-gray-500 text-white p-2 rounded mb-4">Back to Search</button>
@@ -167,6 +191,28 @@ const CanvasImg = ({ imageUrl, onReset }) => {
 
       <div className="mt-4 flex flex-wrap gap-2">
         <button onClick={addText} className="bg-blue-500 text-white p-2 rounded">Add Text</button>
+        <select
+          value={fontFamily}
+          onChange={handleFontChange}
+          className="bg-white border border-gray-400 p-2 rounded"
+          title="Select Font Family"
+        >
+          <option value="Arial">Arial</option>
+          <option value="Helvetica">Helvetica</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Verdana">Verdana</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Comic Sans MS">Comic Sans MS</option>
+        </select>
+
+        {/* Font Size Adjustment */}
+        <button><input
+          type="number"
+          value={fontSize}
+          onChange={(e) => handleFontSizeChange(parseInt(e.target.value, 10))}
+          className="w-16 bg-white border border-gray-400 p-2 rounded"
+        /> </button>
         <button onClick={toggleBold} className="bg-purple-500 text-white p-2 rounded">Bold</button>
         <button onClick={toggleItalic} className="bg-purple-500 text-white p-2 rounded">Italic</button>
         <button onClick={toggleUnderline} className="bg-purple-500 text-white p-2 rounded">Underline</button>
@@ -186,7 +232,6 @@ const CanvasImg = ({ imageUrl, onReset }) => {
           className="p-1 h-10 w-14 bg-white border border-gray-400 cursor-pointer rounded-lg"
           title="Choose your color"
         />
-        
       </div>
 
       <div className="w-full mt-4 flex justify-center">
@@ -194,8 +239,8 @@ const CanvasImg = ({ imageUrl, onReset }) => {
       </div>
 
       <div className="flex justify-center mt-4">
-      <button onClick={downloadImage} className="bg-green-500 text-white p-2 rounded mr-10 mt-5">Download Image</button>
-    </div>
+        <button onClick={downloadImage} className="bg-green-500 text-white p-2 rounded mr-10 mt-5">Download Image</button>
+      </div>
     </div>
   );
 };
