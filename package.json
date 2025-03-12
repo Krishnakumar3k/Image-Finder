@@ -39,5 +39,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "description": "PROJECT LIVE LINK [https://imgcaption.netlify.app/](https://imgcaption.netlify.app/)0963\r In the project directory, you can run:",
+  "main": "postcss.config.js",
+  "devDependencies": {},
+  "author": "",
+  "license": "ISC"
 }
